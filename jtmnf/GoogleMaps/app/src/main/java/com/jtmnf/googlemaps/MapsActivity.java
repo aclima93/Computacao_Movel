@@ -1,13 +1,13 @@
 package com.jtmnf.googlemaps;
 
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class MapsActivity extends FragmentActivity {
@@ -65,10 +65,17 @@ public class MapsActivity extends FragmentActivity {
         mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
 
         mMap.setTrafficEnabled(true);
-        mMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+
+        // adding a new marker everytime the user performs a longpress on a location
+        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
-            public void onMapClick(LatLng latLng) {
-                Toast.makeText(getApplicationContext(), latLng.latitude + "\n"+latLng.longitude, Toast.LENGTH_SHORT).show();
+            public void onMapLongClick(LatLng latLng) {
+                Marker marker = mMap.addMarker(new MarkerOptions()
+                        .position(latLng)
+                );
+
+                // show a toast indicating coordinates of the marker
+                Toast.makeText(getApplicationContext(), "Pinned marker at "+latLng.latitude + "\n" + latLng.longitude, Toast.LENGTH_SHORT).show();
             }
         });
     }
