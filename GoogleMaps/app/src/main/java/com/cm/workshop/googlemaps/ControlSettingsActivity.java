@@ -5,9 +5,6 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -15,9 +12,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
-import android.preference.RingtonePreference;
 import android.support.v7.app.ActionBar;
-import android.text.TextUtils;
 import android.view.MenuItem;
 
 import java.util.List;
@@ -75,7 +70,7 @@ public class ControlSettingsActivity extends AppCompatPreferenceActivity {
     @Override
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public void onBuildHeaders(List<Header> target) {
-        loadHeadersFromResource(R.xml.pref_headers, target);
+        loadHeadersFromResource(R.xml.pref_map_settings_headers, target);
     }
 
     /**
@@ -98,28 +93,6 @@ public class ControlSettingsActivity extends AppCompatPreferenceActivity {
                         index >= 0
                                 ? listPreference.getEntries()[index]
                                 : null);
-
-            } else if (preference instanceof RingtonePreference) {
-                // For ringtone preferences, look up the correct display value
-                // using RingtoneManager.
-                if (TextUtils.isEmpty(stringValue)) {
-                    // Empty values correspond to 'silent' (no ringtone).
-                    preference.setSummary(R.string.pref_ringtone_silent);
-
-                } else {
-                    Ringtone ringtone = RingtoneManager.getRingtone(
-                            preference.getContext(), Uri.parse(stringValue));
-
-                    if (ringtone == null) {
-                        // Clear the summary if there was a lookup error.
-                        preference.setSummary(null);
-                    } else {
-                        // Set the summary to reflect the new ringtone display
-                        // name.
-                        String name = ringtone.getTitle(preference.getContext());
-                        preference.setSummary(name);
-                    }
-                }
 
             } else {
                 // For all other preferences, set the summary to the value's
@@ -157,9 +130,8 @@ public class ControlSettingsActivity extends AppCompatPreferenceActivity {
      */
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
-                || GeneralPreferenceFragment.class.getName().equals(fragmentName)
-                || DataSyncPreferenceFragment.class.getName().equals(fragmentName)
-                || NotificationPreferenceFragment.class.getName().equals(fragmentName);
+                || MapControlPreferenceFragment.class.getName().equals(fragmentName)
+                || MapTypePreferenceFragment.class.getName().equals(fragmentName);
     }
 
     /**
@@ -167,11 +139,11 @@ public class ControlSettingsActivity extends AppCompatPreferenceActivity {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class GeneralPreferenceFragment extends PreferenceFragment {
+    public static class MapTypePreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_general);
+            addPreferencesFromResource(R.xml.pref_map_types_settings);
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
@@ -198,18 +170,24 @@ public class ControlSettingsActivity extends AppCompatPreferenceActivity {
      * activity is showing a two-pane settings UI.
      */
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class NotificationPreferenceFragment extends PreferenceFragment {
+    public static class MapControlPreferenceFragment extends PreferenceFragment {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_notification);
+            addPreferencesFromResource(R.xml.pref_map_controls_settings);
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences
             // to their values. When their values change, their summaries are
             // updated to reflect the new value, per the Android Design
             // guidelines.
-            bindPreferenceSummaryToValue(findPreference("notifications_new_message_ringtone"));
+
+            String [] pref_control_options_keys = getResources().getStringArray(R.array.pref_control_options_keys);
+
+            for(String pref_control_options_key : pref_control_options_keys){
+                bindPreferenceSummaryToValue(findPreference(pref_control_options_key));
+            }
+
         }
 
         @Override
@@ -223,33 +201,4 @@ public class ControlSettingsActivity extends AppCompatPreferenceActivity {
         }
     }
 
-    /**
-     * This fragment shows data and sync preferences only. It is used when the
-     * activity is showing a two-pane settings UI.
-     */
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public static class DataSyncPreferenceFragment extends PreferenceFragment {
-        @Override
-        public void onCreate(Bundle savedInstanceState) {
-            super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_data_sync);
-            setHasOptionsMenu(true);
-
-            // Bind the summaries of EditText/List/Dialog/Ringtone preferences
-            // to their values. When their values change, their summaries are
-            // updated to reflect the new value, per the Android Design
-            // guidelines.
-            bindPreferenceSummaryToValue(findPreference("sync_frequency"));
-        }
-
-        @Override
-        public boolean onOptionsItemSelected(MenuItem item) {
-            int id = item.getItemId();
-            if (id == android.R.id.home) {
-                startActivity(new Intent(getActivity(), ControlSettingsActivity.class));
-                return true;
-            }
-            return super.onOptionsItemSelected(item);
-        }
-    }
 }

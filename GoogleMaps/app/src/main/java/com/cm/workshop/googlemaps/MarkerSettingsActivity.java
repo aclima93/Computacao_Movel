@@ -202,7 +202,7 @@ public class MarkerSettingsActivity extends AppCompatPreferenceActivity {
         @Override
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
-            addPreferencesFromResource(R.xml.pref_notification);
+            addPreferencesFromResource(R.xml.pref_map_controls_settings);
             setHasOptionsMenu(true);
 
             // Bind the summaries of EditText/List/Dialog/Ringtone preferences

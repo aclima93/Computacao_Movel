@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">GoogleMaps</string>
     <string name="title_activity_maps">Map</string>
@@ -18,4 +19,28 @@
     <string name="title_activity_marker_settings">Marker Settings</string>
     <string name="title_activity_control_settings">Control Settings</string>
     <string name="title_activity_map_settings">Map Settings</string>
+
+
+    <!-- Map Control Settings -->
+
+    <string name="pref_header_map_controls">Map Controls</string>
+    <string name="pref_header_map_types">Map Types</string>
+
+    <string name="pref_title_use_custom_control_settings">Use Custom Control Settings</string>
+
+    <string name="zoom_control_title">Zoom Control</string>
+    <string name="zoom_control_key">zoomControl</string>
+
+    <string name="scale_control_title">Scale Control</string>
+    <string name="scale_control_key">scaleControl</string>
+
+    <string name="street_view_control_title">Street View Control</string>
+    <string name="street_view_control_key">streetViewControl</string>
+
+    <string name="rotate_control_title">Rotate Control</string>
+    <string name="rotate_control_key">rotateControl</string>
+
+    <string name="map_type_control_title">Map Type Control</string>
+    <string name="map_type_control_key">mapTypeControl</string>
+
 </resources>

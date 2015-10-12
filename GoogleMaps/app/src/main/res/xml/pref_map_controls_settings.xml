@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- A 'parent' preference, which enables/disables child preferences (below)
+         when checked/unchecked. -->
+    <SwitchPreference
+        android:key="use_custom_control_settings"
+        android:title="@string/pref_title_use_custom_control_settings"
+        android:defaultValue="true" />
+
+    <!-- !!! -->
+    <!-- NOTE: These preferences will be enabled only when the switch above is checked. -->
+    <SwitchPreference
+        android:dependency="use_default_control_settings"
+        android:key="@string/zoom_control_key"
+        android:title="@string/zoom_control_title"
+        android:defaultValue="true" />
+
+    <SwitchPreference
+        android:dependency="use_default_control_settings"
+        android:key="@string/scale_control_key"
+        android:title="@string/scale_control_title"
+        android:defaultValue="false" />
+
+    <SwitchPreference
+        android:dependency="use_default_control_settings"
+        android:key="@string/street_view_control_key"
+        android:title="@string/street_view_control_title"
+        android:defaultValue="false" />
+
+    <SwitchPreference
+        android:dependency="use_default_control_settings"
+        android:key="@string/rotate_control_key"
+        android:title="@string/rotate_control_title"
+        android:defaultValue="true" />
+
+    <SwitchPreference
+        android:dependency="use_default_control_settings"
+        android:key="@string/map_type_control_key"
+        android:title="@string/map_type_control_title"
+        android:defaultValue="false" />
+
+    <!-- TODO: definir aqui as dependências dos Map Types -->
+
+</PreferenceScreen>

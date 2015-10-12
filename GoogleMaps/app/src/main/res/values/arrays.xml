@@ -4,4 +4,29 @@
     <string-array name="pref_sync_frequency_values">Value 1</string-array>
     <string-array name="pref_example_list_titles">Title 1</string-array>
     <string-array name="pref_example_list_values">Value 1</string-array>
+
+
+
+    <!-- *********************** -->
+    <!-- Arrays for Map Controls -->
+    <!-- *********************** -->
+
+    <!-- String titles of displayed options -->
+    <string-array name="pref_control_options_titles">
+        <item>@string/zoom_control_title</item>
+        <item>@string/scale_control_title</item>
+        <item>@string/street_view_control_title</item>
+        <item>@string/rotate_control_title</item>
+        <item>@string/map_type_control_title</item>
+    </string-array>
+
+    <!-- String keys of displayed options for lookup -->
+    <string-array name="pref_control_options_keys">
+        <item>@string/zoom_control_key</item>
+        <item>@string/scale_control_key</item>
+        <item>@string/street_view_control_key</item>
+        <item>@string/rotate_control_key</item>
+        <item>@string/map_type_control_key</item>
+    </string-array>
+
 </resources>
