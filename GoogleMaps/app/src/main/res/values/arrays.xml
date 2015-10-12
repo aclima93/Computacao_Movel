@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="pref_sync_frequency_titles">Title 1</string-array>
+    <string-array name="pref_sync_frequency_values">Value 1</string-array>
+    <string-array name="pref_example_list_titles">Title 1</string-array>
+    <string-array name="pref_example_list_values">Value 1</string-array>
+</resources>
