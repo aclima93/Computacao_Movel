@@ -1,45 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- A 'parent' preference, which enables/disables child preferences (below)
-         when checked/unchecked. -->
+    <!-- A 'parent' preference, which enables/disables child preferences (below) when checked/unchecked. -->
     <SwitchPreference
         android:key="use_custom_control_settings"
-        android:title="@string/pref_title_use_custom_control_settings"
+        android:title="@string/pref_title_use_custom_map_control_settings"
         android:defaultValue="true" />
 
     <!-- !!! -->
     <!-- NOTE: These preferences will be enabled only when the switch above is checked. -->
+
     <SwitchPreference
         android:dependency="use_default_control_settings"
-        android:key="@string/zoom_control_key"
-        android:title="@string/zoom_control_title"
+        android:key="@string/compass_key"
+        android:title="@string/compass_title"
+        android:defaultValue="false" />
+
+    <SwitchPreference
+        android:dependency="use_default_control_settings"
+        android:key="@string/indoor_level_picker_key"
+        android:title="@string/indoor_level_picker_title"
+        android:defaultValue="false" />
+
+    <SwitchPreference
+        android:dependency="use_default_control_settings"
+        android:key="@string/map_toolbar_key"
+        android:title="@string/map_toolbar_title"
         android:defaultValue="true" />
 
     <SwitchPreference
         android:dependency="use_default_control_settings"
-        android:key="@string/scale_control_key"
-        android:title="@string/scale_control_title"
+        android:key="@string/my_location_button_key"
+        android:title="@string/my_location_button_title"
         android:defaultValue="false" />
 
     <SwitchPreference
         android:dependency="use_default_control_settings"
-        android:key="@string/street_view_control_key"
-        android:title="@string/street_view_control_title"
+        android:key="@string/rotate_gestures_key"
+        android:title="@string/rotate_gestures_title"
         android:defaultValue="false" />
 
     <SwitchPreference
         android:dependency="use_default_control_settings"
-        android:key="@string/rotate_control_key"
-        android:title="@string/rotate_control_title"
+        android:key="@string/scroll_gestures_key"
+        android:title="@string/scroll_gestures_title"
+        android:defaultValue="false" />
+
+    <SwitchPreference
+        android:dependency="use_default_control_settings"
+        android:key="@string/tilt_gestures_key"
+        android:title="@string/tilt_gestures_title"
+        android:defaultValue="false" />
+
+    <SwitchPreference
+        android:dependency="use_default_control_settings"
+        android:key="@string/zoom_controls_key"
+        android:title="@string/zoom_controls_title"
         android:defaultValue="true" />
 
     <SwitchPreference
         android:dependency="use_default_control_settings"
-        android:key="@string/map_type_control_key"
-        android:title="@string/map_type_control_title"
-        android:defaultValue="false" />
-
-    <!-- TODO: definir aqui as dependências dos Map Types -->
+        android:key="@string/zoom_gestures_key"
+        android:title="@string/zoom_gestures_title"
+        android:defaultValue="true" />
 
 </PreferenceScreen>

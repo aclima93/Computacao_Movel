@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">GoogleMaps</string>
     <string name="title_activity_maps">Map</string>
     <string name="pref_title_sync_frequency">Data Title</string>
@@ -17,30 +18,39 @@
     <string name="pref_title_vibrate">Vibrate</string>
     <string name="pref_ringtone_silent">Silent</string>
     <string name="title_activity_marker_settings">Marker Settings</string>
-    <string name="title_activity_control_settings">Control Settings</string>
     <string name="title_activity_map_settings">Map Settings</string>
 
-
+    <!-- ******************** -->
     <!-- Map Control Settings -->
+    <!-- ******************** -->
 
+    <!-- Misc. -->
     <string name="pref_header_map_controls">Map Controls</string>
     <string name="pref_header_map_types">Map Types</string>
+    <string name="pref_title_use_custom_map_control_settings">Use Custom Map Control Settings</string>
 
-    <string name="pref_title_use_custom_control_settings">Use Custom Control Settings</string>
+    <!-- Titles -->
+    <string name="compass_title">Compass</string>
+    <string name="indoor_level_picker_title">Indoor Level Picker</string>
+    <string name="map_toolbar_title">Map Toolbar</string>
+    <string name="my_location_button_title">My Location Button</string>
+    <string name="rotate_gestures_title">Rotate Gestures</string>
+    <string name="scroll_gestures_title">Scroll Gestures</string>
+    <string name="tilt_gestures_title">Tilt Gestures</string>
+    <string name="zoom_controls_title">Zoom Controls</string>
+    <string name="zoom_gestures_title">Zoom Gestures</string>
 
-    <string name="zoom_control_title">Zoom Control</string>
-    <string name="zoom_control_key">zoomControl</string>
-
-    <string name="scale_control_title">Scale Control</string>
-    <string name="scale_control_key">scaleControl</string>
-
-    <string name="street_view_control_title">Street View Control</string>
-    <string name="street_view_control_key">streetViewControl</string>
-
-    <string name="rotate_control_title">Rotate Control</string>
-    <string name="rotate_control_key">rotateControl</string>
-
-    <string name="map_type_control_title">Map Type Control</string>
-    <string name="map_type_control_key">mapTypeControl</string>
+    <!-- keys -->
+    <string name="compass_key">compass</string>
+    <string name="indoor_level_picker_key">indoorLevelPicker</string>
+    <string name="map_toolbar_key">mapToolbar</string>
+    <string name="my_location_button_key">myLocationButton</string>
+    <string name="rotate_gestures_key">rotateGestures</string>
+    <string name="scroll_gestures_key">scrollGestures</string>
+    <string name="tilt_gestures_key">tiltGestures</string>
+    <string name="zoom_controls_key">zoomControls</string>
+    <string name="zoom_gestures_key">zoomGestures</string>
+    <string name="action_map_settings">Map Settings</string>
+    <string name="action_marker_settings">Marker Settings</string>
 
 </resources>

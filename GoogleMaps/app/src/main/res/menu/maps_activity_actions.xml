@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:yourapp="http://schemas.android.com/apk/res-auto" >
+
+    <item android:id="@+id/action_map_settings"
+          android:icon="@drawable/ic_map_white_24dp"
+          android:title="@string/action_map_settings"
+          yourapp:showAsAction="ifRoom" />
+
+    <item android:id="@+id/action_marker_settings"
+          android:icon="@drawable/ic_place_white_24dp"
+          android:title="@string/action_marker_settings"
+          yourapp:showAsAction="ifRoom" />
+
+</menu>

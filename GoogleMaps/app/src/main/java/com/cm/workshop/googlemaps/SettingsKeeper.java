@@ -7,32 +7,32 @@ import java.util.HashMap;
  */
 public class SettingsKeeper {
 
-    private HashMap<String, Object> controlConfigurations;
-    private HashMap<String, Object> mapConfigurations;
+    private HashMap<String, Object> mapControlConfigurations;
+    private HashMap<String, Object> mapTypeConfigurations;
     private HashMap<String, Object> markerConfigurations;
 
     public SettingsKeeper(){
-        controlConfigurations = new HashMap<>();
-        mapConfigurations = new HashMap<>();
+        mapControlConfigurations = new HashMap<>();
+        mapTypeConfigurations = new HashMap<>();
         markerConfigurations = new HashMap<>();
     }
 
 
-    public HashMap<String, Object> getControlConfigurations() {
-        return controlConfigurations;
+    public HashMap<String, Object> getMapControlConfigurations() {
+        return mapControlConfigurations;
     }
 
-    public void setControlConfigurations(HashMap<String, Object> controlConfigurations) {
-        this.controlConfigurations = controlConfigurations;
+    public void setMapControlConfigurations(HashMap<String, Object> mapControlConfigurations) {
+        this.mapControlConfigurations = mapControlConfigurations;
     }
 
 
-    public HashMap<String, Object> getMapConfigurations() {
-        return mapConfigurations;
+    public HashMap<String, Object> getMapTypeConfigurations() {
+        return mapTypeConfigurations;
     }
 
-    public void setMapConfigurations(HashMap<String, Object> mapConfigurations) {
-        this.mapConfigurations = mapConfigurations;
+    public void setMapTypeConfigurations(HashMap<String, Object> mapTypeConfigurations) {
+        this.mapTypeConfigurations = mapTypeConfigurations;
     }
 
     public HashMap<String, Object> getMarkerConfigurations() {
