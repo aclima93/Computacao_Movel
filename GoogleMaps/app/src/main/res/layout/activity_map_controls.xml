@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/map_controls_id"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="@dimen/fab_margin">
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/compass_id"
+        android:text="@string/compass_title" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/indoor_level_picker_id"
+        android:text="@string/indoor_level_picker_title"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:dependency="use_default_control_settings"
+        android:id="@+id/map_toolbar_id"
+        android:text="@string/map_toolbar_title"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:dependency="use_default_control_settings"
+        android:id="@+id/my_location_button_id"
+        android:text="@string/my_location_button_title"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:dependency="use_default_control_settings"
+        android:id="@+id/rotate_gestures_id"
+        android:text="@string/rotate_gestures_title"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:dependency="use_default_control_settings"
+        android:id="@+id/scroll_gestures_id"
+        android:text="@string/scroll_gestures_title"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:dependency="use_default_control_settings"
+        android:id="@+id/tilt_gestures_id"
+        android:text="@string/tilt_gestures_title"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:dependency="use_default_control_settings"
+        android:id="@+id/zoom_controls_id"
+        android:text="@string/zoom_controls_title"/>
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:dependency="use_default_control_settings"
+        android:id="@+id/zoom_gestures_id"
+        android:text="@string/zoom_gestures_title"/>
+
+
+</LinearLayout>

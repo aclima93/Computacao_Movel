@@ -1,31 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string-array name="pref_sync_frequency_titles">Title 1</string-array>
-    <string-array name="pref_sync_frequency_values">Value 1</string-array>
-    <string-array name="pref_example_list_titles">Title 1</string-array>
-    <string-array name="pref_example_list_values">Value 1</string-array>
+    <!-- ******************** -->
+    <!-- Map Control Settings -->
+    <!-- ******************** -->
 
-    <!-- *********************** -->
-    <!-- Arrays for Map Controls -->
-    <!-- *********************** -->
-
-    <!-- String titles of displayed options -->
-    <string-array name="pref_control_options_titles">
-        <item>@string/compass_title</item>
-        <item>@string/indoor_level_picker_title</item>
-        <item>@string/map_toolbar_title</item>
-        <item>@string/my_location_button_title</item>
-        <item>@string/rotate_gestures_title</item>
-        <item>@string/scroll_gestures_title</item>
-        <item>@string/tilt_gestures_title</item>
-        <item>@string/zoom_controls_title</item>
-        <item>@string/zoom_gestures_title</item>
-
-    </string-array>
-
-    <!-- String keys of displayed options for lookup -->
-    <string-array name="pref_control_options_keys">
+    <!-- Keys -->
+    <string-array name="map_controls_keys">
         <item>@string/compass_key</item>
         <item>@string/indoor_level_picker_key</item>
         <item>@string/map_toolbar_key</item>
@@ -35,6 +16,19 @@
         <item>@string/tilt_gestures_key</item>
         <item>@string/zoom_controls_key</item>
         <item>@string/zoom_gestures_key</item>
+    </string-array>
+
+    <!-- Values -->
+    <string-array name="map_controls_values">
+        <item>true</item>
+        <item>false</item>
+        <item>false</item>
+        <item>true</item>
+        <item>false</item>
+        <item>false</item>
+        <item>false</item>
+        <item>true</item>
+        <item>false</item>
     </string-array>
 
 </resources>

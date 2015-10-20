@@ -2,32 +2,14 @@
 <resources>
 
     <string name="app_name">GoogleMaps</string>
+
     <string name="title_activity_maps">Map</string>
-    <string name="pref_title_sync_frequency">Data Title</string>
-    <string name="pref_title_system_sync_settings">X Settings</string>
-    <string name="pref_title_social_recommendations">Social Recommendations</string>
-    <string name="pref_description_social_recommendations">Description</string>
-    <string name="pref_title_display_name">Name</string>
-    <string name="pref_default_display_name">Default Name</string>
-    <string name="pref_title_add_friends_to_messages">Add Friends to Messages</string>
-    <string name="pref_header_general">General</string>
-    <string name="pref_header_notifications">Notifications</string>
-    <string name="pref_header_data_sync">Data Sync</string>
-    <string name="pref_title_new_message_notifications">Message Notifications</string>
-    <string name="pref_title_ringtone">Ringtone</string>
-    <string name="pref_title_vibrate">Vibrate</string>
-    <string name="pref_ringtone_silent">Silent</string>
     <string name="title_activity_marker_settings">Marker Settings</string>
-    <string name="title_activity_map_settings">Map Settings</string>
+    <string name="title_activity_map_controls">Map Controls</string>
 
     <!-- ******************** -->
     <!-- Map Control Settings -->
     <!-- ******************** -->
-
-    <!-- Misc. -->
-    <string name="pref_header_map_controls">Map Controls</string>
-    <string name="pref_header_map_types">Map Types</string>
-    <string name="pref_title_use_custom_map_control_settings">Use Custom Map Control Settings</string>
 
     <!-- Titles -->
     <string name="compass_title">Compass</string>
@@ -40,7 +22,7 @@
     <string name="zoom_controls_title">Zoom Controls</string>
     <string name="zoom_gestures_title">Zoom Gestures</string>
 
-    <!-- keys -->
+    <!-- Keys -->
     <string name="compass_key">compass</string>
     <string name="indoor_level_picker_key">indoorLevelPicker</string>
     <string name="map_toolbar_key">mapToolbar</string>
@@ -50,7 +32,20 @@
     <string name="tilt_gestures_key">tiltGestures</string>
     <string name="zoom_controls_key">zoomControls</string>
     <string name="zoom_gestures_key">zoomGestures</string>
+
     <string name="action_map_settings">Map Settings</string>
     <string name="action_marker_settings">Marker Settings</string>
+
+    <!-- ******************** -->
+    <!-- Map Types Settings -->
+    <!-- ******************** -->
+
+
+
+    <!-- ******************** -->
+    <!-- Marker Settings -->
+    <!-- ******************** -->
+
+
 
 </resources>

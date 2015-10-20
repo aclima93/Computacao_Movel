@@ -10,7 +10,6 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -20,14 +19,30 @@ import java.util.HashMap;
 public class MapsActivity extends AppCompatActivity {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
-    private SettingsKeeper settingsKeeper;
+
+    // HashMaps for storing our configurations
+    private HashMap<String, Boolean> mapControlConfigurations;
+    private HashMap<String, Object> mapTypeConfigurations;
+    private HashMap<String, Object> markerConfigurations;
+
+    // Keys for Intent Objects
+    public static final String MAP_CONTROL_CONFIGURATIONS_KEY = "mapControlConfigurations";
+    public static final String MAP_TYPE_CONFIGURATIONS_KEY = "mapTypeConfigurations";
+    public static final String MARKER_CONFIGURATIONS_KEY = "markerConfigurations";
+
+    // Request Codes
+    private static final int MAP_CONTROL_CONFIGURATIONS_RC = 666;
+    private static final int MAP_TYPE_CONFIGURATIONS_RC = 1337;
+    private static final int MARKER_CONFIGURATIONS_RC = 31415;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
-        settingsKeeper = new SettingsKeeper();
+        initMapControlConfigurations();
+        initMapTypeConfigurations();
+        initMarkerConfigurations();
 
         setUpMapIfNeeded();
     }
@@ -56,17 +71,71 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void openMarkerSettings() {
-        startActivity(new Intent(getApplicationContext(), MarkerSettingsActivity.class));
+        //startActivity(new Intent(getApplicationContext(), MarkerSettingsActivity.class));
     }
 
     private void openMapSettings() {
-        startActivity(new Intent(getApplicationContext(), MapSettingsActivity.class));
+        Intent intent = new Intent(getApplicationContext(), MapControlsActivity.class);
+        intent.putExtra(MAP_CONTROL_CONFIGURATIONS_KEY, mapControlConfigurations);
+        startActivityForResult(intent, MAP_CONTROL_CONFIGURATIONS_RC);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+
+        // just in case
         setUpMapIfNeeded();
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+
+        super.onActivityResult(requestCode, resultCode, resultIntent);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == MAP_CONTROL_CONFIGURATIONS_RC) {
+                mapControlConfigurations = (HashMap<String, Boolean>) resultIntent.getSerializableExtra(MAP_CONTROL_CONFIGURATIONS_KEY);
+            }
+            else if (requestCode == MAP_TYPE_CONFIGURATIONS_RC) {
+
+            }
+            else if (requestCode == MARKER_CONFIGURATIONS_RC) {
+
+            }
+        }
+
+        reSetupMap();
+
+    }
+
+    /**
+     * Initialize map controls settings defaults
+     */
+    private void initMapControlConfigurations() {
+
+        mapControlConfigurations = new HashMap<>();
+
+        String[] mapControlsKeys = getResources().getStringArray(R.array.map_controls_keys);
+        String[] mapControlsValues = getResources().getStringArray(R.array.map_controls_values);
+
+        for(int i=0; i<mapControlsKeys.length; i++)
+            mapControlConfigurations.put(mapControlsKeys[i], Boolean.valueOf(mapControlsValues[i]));
+    }
+
+    /**
+     * Initialize map type settings defaults
+     */
+    private void initMapTypeConfigurations() {
+
+        mapTypeConfigurations = new HashMap<>();
+    }
+
+    /**
+     * Initialize marker settings defaults
+     */
+    private void initMarkerConfigurations() {
+
+        markerConfigurations = new HashMap<>();
     }
 
     /**
@@ -98,6 +167,14 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     /**
+     * Force the map to update
+     */
+    private void reSetupMap(){
+        mMap = null;
+        setUpMapIfNeeded();
+    }
+
+    /**
      * This is where we can add markers or lines, add listeners or move the camera. In this case, we
      * just add a marker near Polo 2.
      * <p/>
@@ -123,63 +200,59 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void applyMapSettings() {
-
-        UiSettings mapSettings = mMap.getUiSettings();
-        HashMap<String, Object> mapControlConfigurations = settingsKeeper.getMapControlConfigurations();
-
-
+        
         // Compass
         String compassKey = getString(R.string.compass_key);
         if (mapControlConfigurations.containsKey(compassKey) ) {
-            mapSettings.setCompassEnabled((Boolean) mapControlConfigurations.get(compassKey));
+            mMap.getUiSettings().setCompassEnabled(mapControlConfigurations.get(compassKey));
         }
 
         // Indoor Level Picker
         String indoorLevelPickerKey = getString(R.string.indoor_level_picker_key);
         if (mapControlConfigurations.containsKey(indoorLevelPickerKey) ) {
-            mapSettings.setIndoorLevelPickerEnabled((Boolean) mapControlConfigurations.get(indoorLevelPickerKey));
+            mMap.getUiSettings().setIndoorLevelPickerEnabled(mapControlConfigurations.get(indoorLevelPickerKey));
         }
 
         // Map Toolbar
         String mapToolbarKey = getString(R.string.map_toolbar_key);
         if (mapControlConfigurations.containsKey(mapToolbarKey) ) {
-            mapSettings.setMapToolbarEnabled((Boolean) mapControlConfigurations.get(mapToolbarKey));
+            mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(mapToolbarKey));
         }
 
         // My Location Button
         String myLocationButtonKey = getString(R.string.my_location_button_key);
         if (mapControlConfigurations.containsKey(myLocationButtonKey) ) {
-            mapSettings.setMapToolbarEnabled((Boolean) mapControlConfigurations.get(myLocationButtonKey));
+            mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(myLocationButtonKey));
         }
 
         // Rotate Gestures
         String rotateGesturesKey = getString(R.string.rotate_gestures_key);
         if (mapControlConfigurations.containsKey(rotateGesturesKey) ) {
-            mapSettings.setMapToolbarEnabled((Boolean) mapControlConfigurations.get(rotateGesturesKey));
+            mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(rotateGesturesKey));
         }
 
         // Scroll Gestures
         String scrollGesturesKey = getString(R.string.scroll_gestures_key);
         if (mapControlConfigurations.containsKey(scrollGesturesKey) ) {
-            mapSettings.setMapToolbarEnabled((Boolean) mapControlConfigurations.get(scrollGesturesKey));
+            mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(scrollGesturesKey));
         }
 
         // Tilt Gestures
         String tiltGesturesKey = getString(R.string.tilt_gestures_key);
         if (mapControlConfigurations.containsKey(tiltGesturesKey) ) {
-            mapSettings.setMapToolbarEnabled((Boolean) mapControlConfigurations.get(tiltGesturesKey));
+            mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(tiltGesturesKey));
         }
 
         // Zoom Controls
         String zoomControlsKey = getString(R.string.zoom_controls_key);
         if (mapControlConfigurations.containsKey(zoomControlsKey) ) {
-            mapSettings.setZoomControlsEnabled((Boolean) mapControlConfigurations.get(zoomControlsKey));
+            mMap.getUiSettings().setZoomControlsEnabled(mapControlConfigurations.get(zoomControlsKey));
         }
 
         // Zoom Gestures
         String zoomGesturesKey = getString(R.string.zoom_gestures_key);
         if (mapControlConfigurations.containsKey(zoomGesturesKey) ) {
-            mapSettings.setZoomControlsEnabled((Boolean) mapControlConfigurations.get(zoomGesturesKey));
+            mMap.getUiSettings().setZoomControlsEnabled(mapControlConfigurations.get(zoomGesturesKey));
         }
 
     }
