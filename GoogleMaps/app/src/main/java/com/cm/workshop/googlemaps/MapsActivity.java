@@ -1,24 +1,47 @@
 package com.cm.workshop.googlemaps;
 
 import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import java.text.DateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
-public class MapsActivity extends AppCompatActivity {
+public class MapsActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMyLocationChangeListener, LocationListener, GoogleMap.OnMyLocationButtonClickListener {
 
-    private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+    // Map
+    private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
+
+    // Location
+    private GoogleApiClient googleApiClient; //used for accessing locations with GPS and WIFI
+    private Location lastLocation; // used for storing the last know location of the device
+    private String lastUpdateTime;
+    private LocationRequest locationRequest;
+    private LinearLayout coordinatesLayout;
+    private TextView latitudeTextView;
+    private TextView longitudeTextView;
 
     // HashMaps for storing our configurations
     private HashMap<String, Boolean> mapControlConfigurations;
@@ -30,25 +53,40 @@ public class MapsActivity extends AppCompatActivity {
     public static final String MAP_TYPE_CONFIGURATIONS_KEY = "mapTypeConfigurations";
     public static final String MARKER_CONFIGURATIONS_KEY = "markerConfigurations";
 
-    // Request Codes
-    private static final int MAP_CONTROL_CONFIGURATIONS_RC = 666;
-    private static final int MAP_TYPE_CONFIGURATIONS_RC = 1337;
-    private static final int MARKER_CONFIGURATIONS_RC = 31415;
+    // (Random) Request Codes. Puns intended
+    private static final int MAP_CONTROL_CONFIGURATIONS_RC = 666; // hail science!
+    private static final int MAP_TYPE_CONFIGURATIONS_RC = 1337; // illuminati elite
+    private static final int MARKER_CONFIGURATIONS_RC = 31415; // useful for pi charts
+    
+    // Logging Strings
+    private static final String EVENT = "Event";
+    private static final String FUNCTION = "Function";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
 
+        Log.v(EVENT, "onCreate");
+
+        coordinatesLayout = (LinearLayout) findViewById(R.id.coordinates_layout);
+        latitudeTextView = (TextView) findViewById(R.id.latitude_tv);
+        longitudeTextView = (TextView) findViewById(R.id.longitude_tv);
+        
         initMapControlConfigurations();
         initMapTypeConfigurations();
         initMarkerConfigurations();
 
+        buildGoogleApiClient();
+        createLocationRequest();
         setUpMapIfNeeded();
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+
+        Log.v(EVENT, "onCreateOptionsMenu");
+
         // Inflate the menu items for use in the action bar
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.maps_activity_actions, menu);
@@ -57,24 +95,34 @@ public class MapsActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
+        Log.v(EVENT, "onOptionsItemSelected");
+
         // Handle presses on the action bar items
         switch (item.getItemId()) {
-            case R.id.action_map_settings:
-                openMapSettings();
+            case R.id.action_map_controls:
+                openMapControlsSettings();
                 return true;
-            case R.id.action_marker_settings:
-                openMarkerSettings();
+            case R.id.action_map_types:
+                openMapTypesSettings();
+                return true;
+            case R.id.action_markers:
+                openMarkersSettings();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void openMarkerSettings() {
-        //startActivity(new Intent(getApplicationContext(), MarkerSettingsActivity.class));
+    private void openMarkersSettings() {
+        // TODO:
     }
 
-    private void openMapSettings() {
+    private void openMapTypesSettings() {
+        // TODO:
+    }
+
+    private void openMapControlsSettings() {
         Intent intent = new Intent(getApplicationContext(), MapControlsActivity.class);
         intent.putExtra(MAP_CONTROL_CONFIGURATIONS_KEY, mapControlConfigurations);
         startActivityForResult(intent, MAP_CONTROL_CONFIGURATIONS_RC);
@@ -83,12 +131,23 @@ public class MapsActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-
-        // just in case
+        Log.v(EVENT, "onResume");
+        // an update might be in order
         setUpMapIfNeeded();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.v(EVENT, "onPause");
+        // stop updates
+        stopLocationUpdates();
+    }
+
+
     protected void onActivityResult(int requestCode, int resultCode, Intent resultIntent) {
+
+        Log.v(FUNCTION, "onActivityResult - Assessing the result passed from an activity.");
 
         super.onActivityResult(requestCode, resultCode, resultIntent);
 
@@ -97,10 +156,10 @@ public class MapsActivity extends AppCompatActivity {
                 mapControlConfigurations = (HashMap<String, Boolean>) resultIntent.getSerializableExtra(MAP_CONTROL_CONFIGURATIONS_KEY);
             }
             else if (requestCode == MAP_TYPE_CONFIGURATIONS_RC) {
-
+                mapTypeConfigurations = (HashMap<String, Object>) resultIntent.getSerializableExtra(MAP_TYPE_CONFIGURATIONS_KEY);
             }
             else if (requestCode == MARKER_CONFIGURATIONS_RC) {
-
+                markerConfigurations = (HashMap<String, Object>) resultIntent.getSerializableExtra(MARKER_CONFIGURATIONS_KEY);
             }
         }
 
@@ -138,10 +197,65 @@ public class MapsActivity extends AppCompatActivity {
         markerConfigurations = new HashMap<>();
     }
 
+    @Override
+    public void onConnected(Bundle connectionHint) {
+        lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+        Log.v(EVENT, "onConnected - Location connection successful.");
+        Toast.makeText(getApplicationContext(), "Location connection successful.", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.v(EVENT, "onConnectionSuspended - Location connection suspended.");
+        Toast.makeText(getApplicationContext(), "Location connection suspended.", Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.v(EVENT, "onConnectionFailed - Location connection failed.");
+        Toast.makeText(getApplicationContext(), "Location connection failed.", Toast.LENGTH_LONG).show();
+    }
+
+    protected void startLocationUpdates() {
+        Log.v(FUNCTION, "startLocationUpdates - Starting the location updates.");
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+    }
+
+    protected void stopLocationUpdates() {
+        Log.v(FUNCTION, "stopLocationUpdates - Stopping the location updates.");
+
+        if(googleApiClient.isConnected()) {
+            LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
+        }
+    }
+
+
+    protected synchronized void buildGoogleApiClient() {
+
+        Log.v(FUNCTION, "buildGoogleApiClient - Configuring the Google API access client.");
+
+        googleApiClient = new GoogleApiClient.Builder(this)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .addApi(LocationServices.API)
+                .build();
+    }
+
+    protected void createLocationRequest(){
+
+        Log.v(FUNCTION, "createLocationRequest - Creating the location request.");
+
+        locationRequest = new LocationRequest();
+        locationRequest.setInterval(1000);
+        locationRequest.setFastestInterval(250);
+        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
     /**
      * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
      * installed) and the map has not already been instantiated.. This will ensure that we only ever
-     * call {@link #setUpMap()} once when {@link #mMap} is not null.
+     * call {@link #setUpMap()} once when {@link #googleMap} is not null.
      * <p/>
      * If it isn't installed {@link SupportMapFragment} (and
      * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
@@ -154,13 +268,16 @@ public class MapsActivity extends AppCompatActivity {
      * method in {@link #onResume()} to guarantee that it will be called.
      */
     private void setUpMapIfNeeded() {
+
+        Log.v(FUNCTION, "setUpMapIfNeeded - Set up map if it is necessary.");
+
         // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap == null) {
+        if (googleMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
+            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
                     .getMap();
             // Check if we were successful in obtaining the map.
-            if (mMap != null) {
+            if (googleMap != null) {
                 setUpMap();
             }
         }
@@ -170,7 +287,10 @@ public class MapsActivity extends AppCompatActivity {
      * Force the map to update
      */
     private void reSetupMap(){
-        mMap = null;
+
+        Log.v(FUNCTION, "reSetupMap - Re-setting up map.");
+
+        googleMap = null;
         setUpMapIfNeeded();
     }
 
@@ -178,20 +298,22 @@ public class MapsActivity extends AppCompatActivity {
      * This is where we can add markers or lines, add listeners or move the camera. In this case, we
      * just add a marker near Polo 2.
      * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
+     * This should only be called once and when we are sure that {@link #googleMap} is not null.
      */
     private void setUpMap() {
 
+        Log.v(FUNCTION, "setUpMap - Setting up map.");
+
         applyMapSettings();
 
-        mMap.addMarker(new MarkerOptions().position(new LatLng(40.214266, -8.407384)).title("Pólo 2"));
-
         // adding a new marker everytime the user performs a longpress on a location
-        mMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
+        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
             @Override
             public void onMapLongClick(LatLng latLng) {
 
-                Marker marker = mMap.addMarker(new MarkerOptions().position(latLng).title("A simple marker!"));
+                Log.v(EVENT, "onMapLongClick");
+
+                Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title("A simple marker!"));
 
                 // show a toast indicating coordinates of the marker
                 Toast.makeText(getApplicationContext(), "Pinned marker at " + marker.getPosition().latitude + "\n" + marker.getPosition().longitude, Toast.LENGTH_SHORT).show();
@@ -200,62 +322,134 @@ public class MapsActivity extends AppCompatActivity {
     }
 
     private void applyMapSettings() {
+
+        Log.v(FUNCTION, "applyMapSettings - Applying map settings.");
         
         // Compass
         String compassKey = getString(R.string.compass_title);
         if (mapControlConfigurations.containsKey(compassKey) ) {
-            mMap.getUiSettings().setCompassEnabled(mapControlConfigurations.get(compassKey));
+            googleMap.getUiSettings().setCompassEnabled(mapControlConfigurations.get(compassKey));
         }
 
         // Indoor Level Picker
         String indoorLevelPickerKey = getString(R.string.indoor_level_picker_title);
         if (mapControlConfigurations.containsKey(indoorLevelPickerKey) ) {
-            mMap.setIndoorEnabled(mapControlConfigurations.get(indoorLevelPickerKey));
-            mMap.getUiSettings().setIndoorLevelPickerEnabled(mapControlConfigurations.get(indoorLevelPickerKey));
+            googleMap.setIndoorEnabled(mapControlConfigurations.get(indoorLevelPickerKey));
+            googleMap.getUiSettings().setIndoorLevelPickerEnabled(mapControlConfigurations.get(indoorLevelPickerKey));
         }
 
         // Map Toolbar
         String mapToolbarKey = getString(R.string.map_toolbar_title);
         if (mapControlConfigurations.containsKey(mapToolbarKey) ) {
-            mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(mapToolbarKey));
+            googleMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(mapToolbarKey));
         }
 
         // My Location Button
         String myLocationButtonKey = getString(R.string.my_location_button_title);
         if (mapControlConfigurations.containsKey(myLocationButtonKey) ) {
-            mMap.setMyLocationEnabled(mapControlConfigurations.get(myLocationButtonKey));
-            mMap.getUiSettings().setMyLocationButtonEnabled(mapControlConfigurations.get(myLocationButtonKey));
+
+            boolean value = mapControlConfigurations.get(myLocationButtonKey);
+
+            if(value){
+                coordinatesLayout.setVisibility(View.VISIBLE);
+            }
+            else{
+                coordinatesLayout.setVisibility(View.GONE);
+            }
+
+            googleMap.setMyLocationEnabled(value);
+            googleMap.setOnMyLocationChangeListener(this);
+            googleMap.setOnMyLocationButtonClickListener(this);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(value);
+
+            if (googleApiClient.isConnected() && value) {
+                startLocationUpdates();
+            }
+            else {
+                stopLocationUpdates();
+            }
+
         }
 
         // Rotate Gestures
         String rotateGesturesKey = getString(R.string.rotate_gestures_title);
         if (mapControlConfigurations.containsKey(rotateGesturesKey) ) {
-            mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(rotateGesturesKey));
+            googleMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(rotateGesturesKey));
         }
 
         // Scroll Gestures
         String scrollGesturesKey = getString(R.string.scroll_gestures_title);
         if (mapControlConfigurations.containsKey(scrollGesturesKey) ) {
-            mMap.getUiSettings().setScrollGesturesEnabled(mapControlConfigurations.get(scrollGesturesKey));
+            googleMap.getUiSettings().setScrollGesturesEnabled(mapControlConfigurations.get(scrollGesturesKey));
         }
 
         // Tilt Gestures
         String tiltGesturesKey = getString(R.string.tilt_gestures_title);
         if (mapControlConfigurations.containsKey(tiltGesturesKey) ) {
-            mMap.getUiSettings().setTiltGesturesEnabled(mapControlConfigurations.get(tiltGesturesKey));
+            googleMap.getUiSettings().setTiltGesturesEnabled(mapControlConfigurations.get(tiltGesturesKey));
         }
 
         // Zoom Controls
         String zoomControlsKey = getString(R.string.zoom_controls_title);
         if (mapControlConfigurations.containsKey(zoomControlsKey) ) {
-            mMap.getUiSettings().setZoomControlsEnabled(mapControlConfigurations.get(zoomControlsKey));
+            googleMap.getUiSettings().setZoomControlsEnabled(mapControlConfigurations.get(zoomControlsKey));
         }
 
         // Zoom Gestures
         String zoomGesturesKey = getString(R.string.zoom_gestures_title);
         if (mapControlConfigurations.containsKey(zoomGesturesKey) ) {
-            mMap.getUiSettings().setZoomGesturesEnabled(mapControlConfigurations.get(zoomGesturesKey));
+            googleMap.getUiSettings().setZoomGesturesEnabled(mapControlConfigurations.get(zoomGesturesKey));
         }
 
+    }
+
+    @Override
+    public void onMyLocationChange(Location location) {
+        Log.v(EVENT, "onMyLocationChange");
+        updateLocation(location);
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.v(EVENT, "onLocationChanged");
+        updateLocation(location);
+    }
+
+    @Override
+    public boolean onMyLocationButtonClick() {
+        Log.v(EVENT, "onMyLocationButtonClick");
+
+        if (lastLocation != null) {
+
+            //Convert Location to LatLng
+            LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+            googleMap.addMarker(
+                    new MarkerOptions()
+                            .position(latLng)
+                            .title("You were here ("+latLng.latitude +","+ latLng.longitude +") at " + lastUpdateTime)
+                            .draggable(false)
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_black_18dp))
+            );
+            return true;
+        }
+
+        return false;
+    }
+
+    public void updateLocation(Location location){
+
+        Log.v(FUNCTION, "updateLocation - Updating smartphone location.");
+
+        lastLocation = location;
+        lastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+
+        if (lastLocation != null) {
+
+            latitudeTextView.setText(getString(R.string.latitude) + " " + lastLocation.getLatitude());
+            longitudeTextView.setText(getString(R.string.longitude) + " " + lastLocation.getLongitude());
+
+            // show a toast indicating coordinates of the smartphone and time of update
+            //Toast.makeText(getApplicationContext(), "Pinned marker at latitude " + lastLocation.getLatitude() + "\n and longitude" + lastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+        }
     }
 }

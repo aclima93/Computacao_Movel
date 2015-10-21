@@ -7,6 +7,10 @@
     <string name="title_activity_marker_settings">Marker Settings</string>
     <string name="title_activity_map_controls">Map Controls</string>
 
+    <string name="action_map_controls">Map Controls</string>
+    <string name="action_map_types">Map Types</string>
+    <string name="action_markers">Markers</string>
+
     <!-- ******************** -->
     <!-- Map Control Settings -->
     <!-- ******************** -->
@@ -22,10 +26,9 @@
     <string name="zoom_controls_title">Zoom Controls</string>
     <string name="zoom_gestures_title">Zoom Gestures</string>
 
-    <string name="all_controls_title">All Controls</string>
+    <string name="latitude">Latitude </string>
+    <string name="longitude">Longitude</string>
 
-    <string name="action_map_settings">Map Settings</string>
-    <string name="action_marker_settings">Marker Settings</string>
 
     <!-- ******************** -->
     <!-- Map Types Settings -->
