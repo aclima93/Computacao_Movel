@@ -115,7 +115,7 @@ public class MapsActivity extends AppCompatActivity {
 
         mapControlConfigurations = new HashMap<>();
 
-        String[] mapControlsKeys = getResources().getStringArray(R.array.map_controls_keys);
+        String[] mapControlsKeys = getResources().getStringArray(R.array.map_controls_titles);
         String[] mapControlsValues = getResources().getStringArray(R.array.map_controls_values);
 
         for(int i=0; i<mapControlsKeys.length; i++)
@@ -202,57 +202,59 @@ public class MapsActivity extends AppCompatActivity {
     private void applyMapSettings() {
         
         // Compass
-        String compassKey = getString(R.string.compass_key);
+        String compassKey = getString(R.string.compass_title);
         if (mapControlConfigurations.containsKey(compassKey) ) {
             mMap.getUiSettings().setCompassEnabled(mapControlConfigurations.get(compassKey));
         }
 
         // Indoor Level Picker
-        String indoorLevelPickerKey = getString(R.string.indoor_level_picker_key);
+        String indoorLevelPickerKey = getString(R.string.indoor_level_picker_title);
         if (mapControlConfigurations.containsKey(indoorLevelPickerKey) ) {
+            mMap.setIndoorEnabled(mapControlConfigurations.get(indoorLevelPickerKey));
             mMap.getUiSettings().setIndoorLevelPickerEnabled(mapControlConfigurations.get(indoorLevelPickerKey));
         }
 
         // Map Toolbar
-        String mapToolbarKey = getString(R.string.map_toolbar_key);
+        String mapToolbarKey = getString(R.string.map_toolbar_title);
         if (mapControlConfigurations.containsKey(mapToolbarKey) ) {
             mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(mapToolbarKey));
         }
 
         // My Location Button
-        String myLocationButtonKey = getString(R.string.my_location_button_key);
+        String myLocationButtonKey = getString(R.string.my_location_button_title);
         if (mapControlConfigurations.containsKey(myLocationButtonKey) ) {
-            mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(myLocationButtonKey));
+            mMap.setMyLocationEnabled(mapControlConfigurations.get(myLocationButtonKey));
+            mMap.getUiSettings().setMyLocationButtonEnabled(mapControlConfigurations.get(myLocationButtonKey));
         }
 
         // Rotate Gestures
-        String rotateGesturesKey = getString(R.string.rotate_gestures_key);
+        String rotateGesturesKey = getString(R.string.rotate_gestures_title);
         if (mapControlConfigurations.containsKey(rotateGesturesKey) ) {
             mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(rotateGesturesKey));
         }
 
         // Scroll Gestures
-        String scrollGesturesKey = getString(R.string.scroll_gestures_key);
+        String scrollGesturesKey = getString(R.string.scroll_gestures_title);
         if (mapControlConfigurations.containsKey(scrollGesturesKey) ) {
-            mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(scrollGesturesKey));
+            mMap.getUiSettings().setScrollGesturesEnabled(mapControlConfigurations.get(scrollGesturesKey));
         }
 
         // Tilt Gestures
-        String tiltGesturesKey = getString(R.string.tilt_gestures_key);
+        String tiltGesturesKey = getString(R.string.tilt_gestures_title);
         if (mapControlConfigurations.containsKey(tiltGesturesKey) ) {
-            mMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(tiltGesturesKey));
+            mMap.getUiSettings().setTiltGesturesEnabled(mapControlConfigurations.get(tiltGesturesKey));
         }
 
         // Zoom Controls
-        String zoomControlsKey = getString(R.string.zoom_controls_key);
+        String zoomControlsKey = getString(R.string.zoom_controls_title);
         if (mapControlConfigurations.containsKey(zoomControlsKey) ) {
             mMap.getUiSettings().setZoomControlsEnabled(mapControlConfigurations.get(zoomControlsKey));
         }
 
         // Zoom Gestures
-        String zoomGesturesKey = getString(R.string.zoom_gestures_key);
+        String zoomGesturesKey = getString(R.string.zoom_gestures_title);
         if (mapControlConfigurations.containsKey(zoomGesturesKey) ) {
-            mMap.getUiSettings().setZoomControlsEnabled(mapControlConfigurations.get(zoomGesturesKey));
+            mMap.getUiSettings().setZoomGesturesEnabled(mapControlConfigurations.get(zoomGesturesKey));
         }
 
     }

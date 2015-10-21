@@ -22,16 +22,7 @@
     <string name="zoom_controls_title">Zoom Controls</string>
     <string name="zoom_gestures_title">Zoom Gestures</string>
 
-    <!-- Keys -->
-    <string name="compass_key">compass</string>
-    <string name="indoor_level_picker_key">indoorLevelPicker</string>
-    <string name="map_toolbar_key">mapToolbar</string>
-    <string name="my_location_button_key">myLocationButton</string>
-    <string name="rotate_gestures_key">rotateGestures</string>
-    <string name="scroll_gestures_key">scrollGestures</string>
-    <string name="tilt_gestures_key">tiltGestures</string>
-    <string name="zoom_controls_key">zoomControls</string>
-    <string name="zoom_gestures_key">zoomGestures</string>
+    <string name="all_controls_title">All Controls</string>
 
     <string name="action_map_settings">Map Settings</string>
     <string name="action_marker_settings">Marker Settings</string>

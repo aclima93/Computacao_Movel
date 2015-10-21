@@ -6,29 +6,29 @@
     <!-- ******************** -->
 
     <!-- Keys -->
-    <string-array name="map_controls_keys">
-        <item>@string/compass_key</item>
-        <item>@string/indoor_level_picker_key</item>
-        <item>@string/map_toolbar_key</item>
-        <item>@string/my_location_button_key</item>
-        <item>@string/rotate_gestures_key</item>
-        <item>@string/scroll_gestures_key</item>
-        <item>@string/tilt_gestures_key</item>
-        <item>@string/zoom_controls_key</item>
-        <item>@string/zoom_gestures_key</item>
+    <string-array name="map_controls_titles">
+        <item>@string/compass_title</item>
+        <item>@string/indoor_level_picker_title</item>
+        <item>@string/map_toolbar_title</item>
+        <item>@string/my_location_button_title</item>
+        <item>@string/rotate_gestures_title</item>
+        <item>@string/scroll_gestures_title</item>
+        <item>@string/tilt_gestures_title</item>
+        <item>@string/zoom_controls_title</item>
+        <item>@string/zoom_gestures_title</item>
     </string-array>
 
     <!-- Values -->
     <string-array name="map_controls_values">
         <item>true</item>
-        <item>false</item>
-        <item>false</item>
         <item>true</item>
-        <item>false</item>
-        <item>false</item>
-        <item>false</item>
         <item>true</item>
-        <item>false</item>
+        <item>true</item>
+        <item>true</item>
+        <item>true</item>
+        <item>true</item>
+        <item>true</item>
+        <item>true</item>
     </string-array>
 
 </resources>
