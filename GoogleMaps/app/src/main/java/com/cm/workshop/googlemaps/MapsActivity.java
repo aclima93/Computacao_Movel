@@ -240,6 +240,8 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
                 .addOnConnectionFailedListener(this)
                 .addApi(LocationServices.API)
                 .build();
+
+        googleApiClient.connect();
     }
 
     protected void createLocationRequest(){
@@ -362,11 +364,8 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
             googleMap.setOnMyLocationButtonClickListener(this);
             googleMap.getUiSettings().setMyLocationButtonEnabled(value);
 
-            if (googleApiClient.isConnected() && value) {
+            if(googleApiClient.isConnected() && value) {
                 startLocationUpdates();
-            }
-            else {
-                stopLocationUpdates();
             }
 
         }
@@ -423,15 +422,22 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
             //Convert Location to LatLng
             LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+
+            // add marker to current position
             googleMap.addMarker(
-                    new MarkerOptions()
-                            .position(latLng)
-                            .title("You were here ("+latLng.latitude +","+ latLng.longitude +") at " + lastUpdateTime)
-                            .draggable(false)
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_black_18dp))
+                new MarkerOptions()
+                        .position(latLng)
+                        .title("You were here (" + latLng.latitude + "," + latLng.longitude +") at " + lastUpdateTime)
+                        .draggable(false)
+                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_black_18dp))
             );
+
+            Toast.makeText(getApplicationContext(), "Added marker to your location", Toast.LENGTH_SHORT).show();
+
             return true;
         }
+
+        Toast.makeText(getApplicationContext(), "Location unavailable...", Toast.LENGTH_SHORT).show();
 
         return false;
     }
