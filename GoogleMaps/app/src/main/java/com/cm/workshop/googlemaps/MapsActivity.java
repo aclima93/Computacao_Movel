@@ -18,12 +18,11 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -42,6 +41,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     private LinearLayout coordinatesLayout;
     private TextView latitudeTextView;
     private TextView longitudeTextView;
+    private TextView lastUpdateTimeTextView;
 
     // HashMaps for storing our configurations
     private HashMap<String, Boolean> mapControlConfigurations;
@@ -72,6 +72,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         coordinatesLayout = (LinearLayout) findViewById(R.id.coordinates_layout);
         latitudeTextView = (TextView) findViewById(R.id.latitude_tv);
         longitudeTextView = (TextView) findViewById(R.id.longitude_tv);
+        lastUpdateTimeTextView = (TextView) findViewById(R.id.last_update_time_tv);
         
         initMapControlConfigurations();
         initMapTypeConfigurations();
@@ -133,6 +134,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         super.onResume();
         Log.v(EVENT, "onResume");
         // an update might be in order
+        buildGoogleApiClient();
         setUpMapIfNeeded();
     }
 
@@ -199,7 +201,8 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        lastLocation = LocationServices.FusedLocationApi.getLastLocation(googleApiClient);
+
+        updateLocation(LocationServices.FusedLocationApi.getLastLocation(googleApiClient));
 
         Log.v(EVENT, "onConnected - Location connection successful.");
         Toast.makeText(getApplicationContext(), "Location connection successful.", Toast.LENGTH_SHORT).show();
@@ -230,7 +233,9 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         }
     }
 
-
+    /**
+     * In order to use Google's API we must configure the connection.
+     */
     protected synchronized void buildGoogleApiClient() {
 
         Log.v(FUNCTION, "buildGoogleApiClient - Configuring the Google API access client.");
@@ -244,6 +249,9 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         googleApiClient.connect();
     }
 
+    /**
+     * A LocationRequest is what determines the frequency, precision, priority, etc. of location updates.
+     */
     protected void createLocationRequest(){
 
         Log.v(FUNCTION, "createLocationRequest - Creating the location request.");
@@ -275,9 +283,10 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
         // Do a null check to confirm that we have not already instantiated the map.
         if (googleMap == null) {
+
             // Try to obtain the map from the SupportMapFragment.
-            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
+            googleMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map)).getMap();
+
             // Check if we were successful in obtaining the map.
             if (googleMap != null) {
                 setUpMap();
@@ -297,8 +306,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Polo 2.
+     * This is where we can add markers or lines, add listeners or move the camera.
      * <p/>
      * This should only be called once and when we are sure that {@link #googleMap} is not null.
      */
@@ -308,21 +316,11 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
         applyMapSettings();
 
-        // adding a new marker everytime the user performs a longpress on a location
-        googleMap.setOnMapLongClickListener(new GoogleMap.OnMapLongClickListener() {
-            @Override
-            public void onMapLongClick(LatLng latLng) {
-
-                Log.v(EVENT, "onMapLongClick");
-
-                Marker marker = googleMap.addMarker(new MarkerOptions().position(latLng).title("A simple marker!"));
-
-                // show a toast indicating coordinates of the marker
-                Toast.makeText(getApplicationContext(), "Pinned marker at " + marker.getPosition().latitude + "\n" + marker.getPosition().longitude, Toast.LENGTH_SHORT).show();
-            }
-        });
     }
 
+    /**
+     * Based on the user configurations, set the map UI and listeners.
+     */
     private void applyMapSettings() {
 
         Log.v(FUNCTION, "applyMapSettings - Applying map settings.");
@@ -418,27 +416,23 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     public boolean onMyLocationButtonClick() {
         Log.v(EVENT, "onMyLocationButtonClick");
 
-        if (lastLocation != null) {
+        if(lastLocation != null) {
 
-            //Convert Location to LatLng
-            LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+            CameraPosition cameraPosition = new CameraPosition.Builder().
+                target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
+                /*
+                .tilt(60)
+                .zoom(15)
+                .bearing(0)
+                */
+                .build();
 
-            // add marker to current position
-            googleMap.addMarker(
-                new MarkerOptions()
-                        .position(latLng)
-                        .title("You were here (" + latLng.latitude + "," + latLng.longitude +") at " + lastUpdateTime)
-                        .draggable(false)
-                        .icon(BitmapDescriptorFactory.fromResource(R.drawable.ic_person_pin_black_18dp))
-            );
-
-            Toast.makeText(getApplicationContext(), "Added marker to your location", Toast.LENGTH_SHORT).show();
-
+            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+            Toast.makeText(getApplicationContext(), "Teleporting to your location...", Toast.LENGTH_SHORT).show();
             return true;
         }
 
         Toast.makeText(getApplicationContext(), "Location unavailable...", Toast.LENGTH_SHORT).show();
-
         return false;
     }
 
@@ -447,15 +441,15 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         Log.v(FUNCTION, "updateLocation - Updating smartphone location.");
 
         lastLocation = location;
-        lastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 
         if (lastLocation != null) {
 
-            latitudeTextView.setText(getString(R.string.latitude) + " " + lastLocation.getLatitude());
-            longitudeTextView.setText(getString(R.string.longitude) + " " + lastLocation.getLongitude());
+            lastUpdateTime = DateFormat.getTimeInstance().format(new Date());
 
-            // show a toast indicating coordinates of the smartphone and time of update
-            //Toast.makeText(getApplicationContext(), "Pinned marker at latitude " + lastLocation.getLatitude() + "\n and longitude" + lastLocation.getLongitude(), Toast.LENGTH_SHORT).show();
+            latitudeTextView.setText(String.valueOf(lastLocation.getLatitude()));
+            longitudeTextView.setText(String.valueOf(lastLocation.getLongitude()));
+            lastUpdateTimeTextView.setText(lastUpdateTime);
+
         }
     }
 }

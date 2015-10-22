@@ -28,6 +28,7 @@
 
     <string name="latitude">Latitude </string>
     <string name="longitude">Longitude</string>
+    <string name="last_update_time">Last Update Time</string>
 
 
     <!-- ******************** -->
