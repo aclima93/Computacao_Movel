@@ -1,7 +1,12 @@
 package com.cm.workshop.googlemaps;
 
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -23,25 +28,39 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.HashMap;
 
-public class MapsActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, GoogleMap.OnMyLocationChangeListener, LocationListener, GoogleMap.OnMyLocationButtonClickListener {
+public class MapsActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     // Map
     private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
-
-    // Location
-    private GoogleApiClient googleApiClient; //used for accessing locations with GPS and WIFI
-    private Location lastLocation; // used for storing the last know location of the device
-    private String lastUpdateTime;
-    private LocationRequest locationRequest;
     private LinearLayout coordinatesLayout;
-    private TextView latitudeTextView;
-    private TextView longitudeTextView;
-    private TextView lastUpdateTimeTextView;
+
+    // GPS Location
+    private GoogleApiClient googleApiClient; //used for accessing locations with GPS and WIFI
+    private Location lastGPSLocation; // used for storing the last know location of the device
+    private String lastGPSUpdateTime;
+    private LocationRequest gpsLocationRequest;
+    private TextView gpsLatitudeTextView;
+    private TextView gpsLongitudeTextView;
+    private TextView lastGPSUpdateTimeTextView;
+    private static final int GPS_UPDATE_INTERVAL = 1000;
+    private static final int GPS_UPDATE_MAX_INTERVAL = 250;
+
+    // Internet Location
+    private Marker networkMarker;
+    private String lastNetworkUpdateTime;
+    private LinearLayout networkCoordinatesLayout;
+    private TextView networkLatitudeTextView;
+    private TextView networkLongitudeTextView;
+    private TextView lastNetworkUpdateTimeTextView;
+    private static final int NETWORK_UPDATE_INTERVAL = 1000;
+    private static final int NETWORK_UPDATE_DISTANCE = 0;
 
     // HashMaps for storing our configurations
     private HashMap<String, Boolean> mapControlConfigurations;
@@ -57,7 +76,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     private static final int MAP_CONTROL_CONFIGURATIONS_RC = 666; // hail science!
     private static final int MAP_TYPE_CONFIGURATIONS_RC = 1337; // illuminati elite
     private static final int MARKER_CONFIGURATIONS_RC = 31415; // useful for pi charts
-    
+
     // Logging Strings
     private static final String EVENT = "Event";
     private static final String FUNCTION = "Function";
@@ -70,10 +89,15 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         Log.v(EVENT, "onCreate");
 
         coordinatesLayout = (LinearLayout) findViewById(R.id.coordinates_layout);
-        latitudeTextView = (TextView) findViewById(R.id.latitude_tv);
-        longitudeTextView = (TextView) findViewById(R.id.longitude_tv);
-        lastUpdateTimeTextView = (TextView) findViewById(R.id.last_update_time_tv);
-        
+
+        gpsLatitudeTextView = (TextView) findViewById(R.id.gps_latitude_tv);
+        gpsLongitudeTextView = (TextView) findViewById(R.id.gps_longitude_tv);
+        lastGPSUpdateTimeTextView = (TextView) findViewById(R.id.last_gps_update_time_tv);
+
+        networkLatitudeTextView = (TextView) findViewById(R.id.network_latitude_tv);
+        networkLongitudeTextView = (TextView) findViewById(R.id.network_longitude_tv);
+        lastNetworkUpdateTimeTextView = (TextView) findViewById(R.id.last_network_update_time_tv);
+
         initMapControlConfigurations();
         initMapTypeConfigurations();
         initMarkerConfigurations();
@@ -156,11 +180,9 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         if (resultCode == RESULT_OK) {
             if (requestCode == MAP_CONTROL_CONFIGURATIONS_RC) {
                 mapControlConfigurations = (HashMap<String, Boolean>) resultIntent.getSerializableExtra(MAP_CONTROL_CONFIGURATIONS_KEY);
-            }
-            else if (requestCode == MAP_TYPE_CONFIGURATIONS_RC) {
+            } else if (requestCode == MAP_TYPE_CONFIGURATIONS_RC) {
                 mapTypeConfigurations = (HashMap<String, Object>) resultIntent.getSerializableExtra(MAP_TYPE_CONFIGURATIONS_KEY);
-            }
-            else if (requestCode == MARKER_CONFIGURATIONS_RC) {
+            } else if (requestCode == MARKER_CONFIGURATIONS_RC) {
                 markerConfigurations = (HashMap<String, Object>) resultIntent.getSerializableExtra(MARKER_CONFIGURATIONS_KEY);
             }
         }
@@ -179,7 +201,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         String[] mapControlsKeys = getResources().getStringArray(R.array.map_controls_titles);
         String[] mapControlsValues = getResources().getStringArray(R.array.map_controls_values);
 
-        for(int i=0; i<mapControlsKeys.length; i++)
+        for (int i = 0; i < mapControlsKeys.length; i++)
             mapControlConfigurations.put(mapControlsKeys[i], Boolean.valueOf(mapControlsValues[i]));
     }
 
@@ -202,7 +224,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     public void onConnected(Bundle connectionHint) {
 
-        updateLocation(LocationServices.FusedLocationApi.getLastLocation(googleApiClient));
+        updateGPSLocation(LocationServices.FusedLocationApi.getLastLocation(googleApiClient));
 
         Log.v(EVENT, "onConnected - Location connection successful.");
         Toast.makeText(getApplicationContext(), "Location connection successful.", Toast.LENGTH_SHORT).show();
@@ -221,8 +243,47 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     protected void startLocationUpdates() {
+
+        //
+        // GPS Location
+        //
+
         Log.v(FUNCTION, "startLocationUpdates - Starting the location updates.");
-        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, locationRequest, this);
+        LocationServices.FusedLocationApi.requestLocationUpdates(googleApiClient, gpsLocationRequest, this);
+
+        //
+        // Network Location
+        //
+
+        // Acquire a reference to the system Location Manager
+        LocationManager locationManager = (LocationManager) this.getSystemService(Context.LOCATION_SERVICE);
+
+        // Define a listener that responds to location updates
+        android.location.LocationListener locationListener = new android.location.LocationListener() {
+            public void onLocationChanged(Location location) {
+                // Called when a new location is found by the network location provider.
+                updateNetworkLocation(location);
+            }
+
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+
+            public void onProviderEnabled(String provider) {
+            }
+
+            public void onProviderDisabled(String provider) {
+            }
+        };
+
+        // checking for permissions at runtime is troublesome for the programmer... users should just read the fine print
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                    && checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                return;
+            }
+        }
+        // Register the listener with the Location Manager to receive location updates
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, NETWORK_UPDATE_INTERVAL, NETWORK_UPDATE_DISTANCE, locationListener);
     }
 
     protected void stopLocationUpdates() {
@@ -231,6 +292,12 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         if(googleApiClient.isConnected()) {
             LocationServices.FusedLocationApi.removeLocationUpdates(googleApiClient, this);
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        Log.v(EVENT, "onLocationChanged");
+        updateGPSLocation(location);
     }
 
     /**
@@ -256,10 +323,10 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
         Log.v(FUNCTION, "createLocationRequest - Creating the location request.");
 
-        locationRequest = new LocationRequest();
-        locationRequest.setInterval(1000);
-        locationRequest.setFastestInterval(250);
-        locationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        gpsLocationRequest = new LocationRequest();
+        gpsLocationRequest.setInterval(GPS_UPDATE_INTERVAL);
+        gpsLocationRequest.setFastestInterval(GPS_UPDATE_MAX_INTERVAL);
+        gpsLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
     }
 
     /**
@@ -324,7 +391,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     private void applyMapSettings() {
 
         Log.v(FUNCTION, "applyMapSettings - Applying map settings.");
-        
+
         // Compass
         String compassKey = getString(R.string.compass_title);
         if (mapControlConfigurations.containsKey(compassKey) ) {
@@ -358,8 +425,35 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
             }
 
             googleMap.setMyLocationEnabled(value);
-            googleMap.setOnMyLocationChangeListener(this);
-            googleMap.setOnMyLocationButtonClickListener(this);
+            googleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
+                @Override
+                public void onMyLocationChange(Location location) {
+                    Log.v(EVENT, "onMyLocationChange");
+                    updateGPSLocation(location);
+                }
+            });
+            googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
+                @Override
+                public boolean onMyLocationButtonClick() {
+                    Log.v(EVENT, "onMyLocationButtonClick");
+
+                    if(lastGPSLocation != null) {
+
+                        Toast.makeText(getApplicationContext(), "Teleporting to your location...", Toast.LENGTH_SHORT).show();
+                        CameraPosition cameraPosition = new CameraPosition.Builder().
+                                target(new LatLng(lastGPSLocation.getLatitude(), lastGPSLocation.getLongitude()))
+                                .tilt(0)
+                                .zoom(googleMap.getMaxZoomLevel()-2) // come closer my little friend
+                                .bearing(0)
+                                .build();
+                        googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+                        return true;
+                    }
+
+                    Toast.makeText(getApplicationContext(), "Location unavailable...", Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            });
             googleMap.getUiSettings().setMyLocationButtonEnabled(value);
 
             if(googleApiClient.isConnected() && value) {
@@ -400,56 +494,41 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
     }
 
-    @Override
-    public void onMyLocationChange(Location location) {
-        Log.v(EVENT, "onMyLocationChange");
-        updateLocation(location);
-    }
+    public void updateGPSLocation(Location location){
 
-    @Override
-    public void onLocationChanged(Location location) {
-        Log.v(EVENT, "onLocationChanged");
-        updateLocation(location);
-    }
+        Log.v(FUNCTION, "updateGPSLocation - Updating smartphone location using GPS.");
 
-    @Override
-    public boolean onMyLocationButtonClick() {
-        Log.v(EVENT, "onMyLocationButtonClick");
+        lastGPSLocation = location;
 
-        if(lastLocation != null) {
+        if (lastGPSLocation != null) {
 
-            CameraPosition cameraPosition = new CameraPosition.Builder().
-                target(new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude()))
-                /*
-                .tilt(60)
-                .zoom(15)
-                .bearing(0)
-                */
-                .build();
+            lastGPSUpdateTime = DateFormat.getTimeInstance().format(new Date());
 
-            googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-            Toast.makeText(getApplicationContext(), "Teleporting to your location...", Toast.LENGTH_SHORT).show();
-            return true;
-        }
-
-        Toast.makeText(getApplicationContext(), "Location unavailable...", Toast.LENGTH_SHORT).show();
-        return false;
-    }
-
-    public void updateLocation(Location location){
-
-        Log.v(FUNCTION, "updateLocation - Updating smartphone location.");
-
-        lastLocation = location;
-
-        if (lastLocation != null) {
-
-            lastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-
-            latitudeTextView.setText(String.valueOf(lastLocation.getLatitude()));
-            longitudeTextView.setText(String.valueOf(lastLocation.getLongitude()));
-            lastUpdateTimeTextView.setText(lastUpdateTime);
+            gpsLatitudeTextView.setText(String.valueOf(lastGPSLocation.getLatitude()));
+            gpsLongitudeTextView.setText(String.valueOf(lastGPSLocation.getLongitude()));
+            lastGPSUpdateTimeTextView.setText(lastGPSUpdateTime);
 
         }
+    }
+
+    public void updateNetworkLocation(Location location){
+
+        Log.v(FUNCTION, "updateNetworkLocation - Updating smartphone location using the Internet.");
+
+        if(networkMarker == null) {
+            networkMarker = googleMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                    .title("Network Estimate"));
+        }
+        else {
+            networkMarker.setPosition(new LatLng(location.getLatitude(), location.getLongitude()));
+        }
+
+        lastNetworkUpdateTime = DateFormat.getTimeInstance().format(new Date());
+
+        networkLatitudeTextView.setText(String.valueOf(location.getLatitude()));
+        networkLongitudeTextView.setText(String.valueOf(location.getLongitude()));
+        lastNetworkUpdateTimeTextView.setText(lastGPSUpdateTime);
+
     }
 }

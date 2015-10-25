@@ -18,6 +18,34 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/data"
+                android:gravity="start"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gps"
+                android:gravity="center"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/network"
+                android:gravity="end"
+                android:layout_margin="@dimen/map_label_margin"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:id="@+id/latitude_layout"
             android:orientation="horizontal"
             android:gravity="center">
@@ -27,14 +55,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/latitude"
+                android:gravity="start"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:id="@+id/gps_latitude_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_margin="@dimen/map_label_margin"/>
 
             <TextView
-                android:id="@+id/latitude_tv"
+                android:id="@+id/network_latitude_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="end"
                 android:layout_margin="@dimen/map_label_margin"/>
         </LinearLayout>
 
@@ -50,14 +85,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/longitude"
+                android:gravity="start"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:id="@+id/gps_longitude_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_margin="@dimen/map_label_margin"/>
 
             <TextView
-                android:id="@+id/longitude_tv"
+                android:id="@+id/network_longitude_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="end"
                 android:layout_margin="@dimen/map_label_margin"/>
         </LinearLayout>
 
@@ -73,14 +115,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/last_update_time"
+                android:gravity="start"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:id="@+id/last_gps_update_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_margin="@dimen/map_label_margin"/>
 
             <TextView
-                android:id="@+id/last_update_time_tv"
+                android:id="@+id/last_network_update_time_tv"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:gravity="end"
                 android:layout_margin="@dimen/map_label_margin"/>
         </LinearLayout>
 
