@@ -63,7 +63,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
     // HashMaps for storing our configurations
     private HashMap<String, Boolean> mapControlConfigurations;
-    private HashMap<String, Object> mapTypeConfigurations;
     private HashMap<String, Object> markerConfigurations;
 
     // Keys for Intent Objects
@@ -98,7 +97,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         lastNetworkUpdateTimeTextView = (TextView) findViewById(R.id.last_network_update_time_tv);
 
         initMapControlConfigurations();
-        initMapTypeConfigurations();
         initMarkerConfigurations();
 
         buildGoogleApiClient();
@@ -143,7 +141,8 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     private void openMapTypesSettings() {
-        // TODO:
+        Intent intent = new Intent(getApplicationContext(), MapTypesActivity.class);
+        startActivityForResult(intent, MAP_TYPE_CONFIGURATIONS_RC);
     }
 
     private void openMapControlsSettings() {
@@ -180,8 +179,11 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
             if (requestCode == MAP_CONTROL_CONFIGURATIONS_RC) {
                 mapControlConfigurations = (HashMap<String, Boolean>) resultIntent.getSerializableExtra(MAP_CONTROL_CONFIGURATIONS_KEY);
             } else if (requestCode == MAP_TYPE_CONFIGURATIONS_RC) {
-                mapTypeConfigurations = (HashMap<String, Object>) resultIntent.getSerializableExtra(MAP_TYPE_CONFIGURATIONS_KEY);
+
+                googleMap.setMapType(resultIntent.getIntExtra(MAP_TYPE_CONFIGURATIONS_KEY, 0));
+
             } else if (requestCode == MARKER_CONFIGURATIONS_RC) {
+
                 markerConfigurations = (HashMap<String, Object>) resultIntent.getSerializableExtra(MARKER_CONFIGURATIONS_KEY);
             }
         }
@@ -202,14 +204,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
         for (int i = 0; i < mapControlsKeys.length; i++)
             mapControlConfigurations.put(mapControlsKeys[i], Boolean.valueOf(mapControlsValues[i]));
-    }
-
-    /**
-     * Initialize map type settings defaults
-     */
-    private void initMapTypeConfigurations() {
-
-        mapTypeConfigurations = new HashMap<>();
     }
 
     /**
@@ -536,5 +530,9 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         networkLongitudeTextView.setText(String.valueOf(location.getLongitude()));
         lastNetworkUpdateTimeTextView.setText(lastNetworkUpdateTime);
 
+    }
+
+    public GoogleMap getGoogleMap() {
+        return googleMap;
     }
 }
