@@ -1,7 +1,145 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:id="@+id/map"
     tools:context=".MapsActivity"
-    android:name="com.google.android.gms.maps.SupportMapFragment" />
+    android:id="@+id/map_layout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/coordinates_layout"
+        android:orientation="vertical"
+        android:layout_alignParentTop="true"
+        android:gravity="center">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/data"
+                android:gravity="start"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/gps"
+                android:gravity="center"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/network"
+                android:gravity="end"
+                android:layout_margin="@dimen/map_label_margin"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/latitude_layout"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/latitude_text_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/latitude"
+                android:gravity="start"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:id="@+id/gps_latitude_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:id="@+id/network_latitude_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:layout_margin="@dimen/map_label_margin"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/longitude_layout"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/longitude_text_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/longitude"
+                android:gravity="start"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:id="@+id/gps_longitude_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:id="@+id/network_longitude_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:layout_margin="@dimen/map_label_margin"/>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/last_update_time_layout"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/last_update_time_text_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/last_update_time"
+                android:gravity="start"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:id="@+id/last_gps_update_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_margin="@dimen/map_label_margin"/>
+
+            <TextView
+                android:id="@+id/last_network_update_time_tv"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="end"
+                android:layout_margin="@dimen/map_label_margin"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_below="@id/coordinates_layout"/>
+
+</RelativeLayout>
