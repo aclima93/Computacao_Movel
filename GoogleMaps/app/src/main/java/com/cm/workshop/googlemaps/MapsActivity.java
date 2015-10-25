@@ -55,7 +55,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     // Internet Location
     private Marker networkMarker;
     private String lastNetworkUpdateTime;
-    private LinearLayout networkCoordinatesLayout;
     private TextView networkLatitudeTextView;
     private TextView networkLongitudeTextView;
     private TextView lastNetworkUpdateTimeTextView;
@@ -317,7 +316,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     /**
-     * A LocationRequest is what determines the frequency, precision, priority, etc. of location updates.
+     * A LocationRequest determines the frequency, precision, priority, etc. of location updates.
      */
     protected void createLocationRequest(){
 
@@ -424,6 +423,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
                 coordinatesLayout.setVisibility(View.GONE);
             }
 
+            // enable the map's "My Location" logic (mainly interfaces)
             googleMap.setMyLocationEnabled(value);
             googleMap.setOnMyLocationChangeListener(new GoogleMap.OnMyLocationChangeListener() {
                 @Override
@@ -432,21 +432,28 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
                     updateGPSLocation(location);
                 }
             });
+
+            // enable the UI's "My Location" button
+            googleMap.getUiSettings().setMyLocationButtonEnabled(value);
             googleMap.setOnMyLocationButtonClickListener(new GoogleMap.OnMyLocationButtonClickListener() {
                 @Override
                 public boolean onMyLocationButtonClick() {
                     Log.v(EVENT, "onMyLocationButtonClick");
 
-                    if(lastGPSLocation != null) {
+                    if (lastGPSLocation != null) {
 
                         Toast.makeText(getApplicationContext(), "Teleporting to your location...", Toast.LENGTH_SHORT).show();
+
+                        // zoom in on our last know location
                         CameraPosition cameraPosition = new CameraPosition.Builder().
                                 target(new LatLng(lastGPSLocation.getLatitude(), lastGPSLocation.getLongitude()))
                                 .tilt(0)
-                                .zoom(googleMap.getMaxZoomLevel()-2) // come closer my little friend
+                                .zoom(googleMap.getMaxZoomLevel() - 2) // come closer my little friend
                                 .bearing(0)
                                 .build();
+
                         googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
                         return true;
                     }
 
@@ -454,7 +461,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
                     return false;
                 }
             });
-            googleMap.getUiSettings().setMyLocationButtonEnabled(value);
 
             if(googleApiClient.isConnected() && value) {
                 startLocationUpdates();
@@ -528,7 +534,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
         networkLatitudeTextView.setText(String.valueOf(location.getLatitude()));
         networkLongitudeTextView.setText(String.valueOf(location.getLongitude()));
-        lastNetworkUpdateTimeTextView.setText(lastGPSUpdateTime);
+        lastNetworkUpdateTimeTextView.setText(lastNetworkUpdateTime);
 
     }
 }

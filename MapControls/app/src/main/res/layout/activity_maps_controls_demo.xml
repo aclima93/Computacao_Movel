@@ -2,7 +2,7 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".MapsActivity"
+    tools:context=".MapsControlsDemoActivity"
     android:id="@+id/map_layout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent">
@@ -15,34 +15,6 @@
         android:layout_alignParentTop="true"
         android:gravity="center">
 
-        <!-- Columns -->
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/data"
-                android:gravity="start"
-                android:layout_margin="@dimen/map_label_margin"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/gps"
-                android:gravity="center"
-                android:layout_margin="@dimen/map_label_margin"/>
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/network"
-                android:gravity="end"
-                android:layout_margin="@dimen/map_label_margin"/>
-        </LinearLayout>
 
         <!-- Latitide -->
         <LinearLayout
@@ -67,12 +39,6 @@
                 android:gravity="center"
                 android:layout_margin="@dimen/map_label_margin"/>
 
-            <TextView
-                android:id="@+id/network_latitude_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:layout_margin="@dimen/map_label_margin"/>
         </LinearLayout>
 
         <!-- Longitude -->
@@ -98,12 +64,6 @@
                 android:gravity="center"
                 android:layout_margin="@dimen/map_label_margin"/>
 
-            <TextView
-                android:id="@+id/network_longitude_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:layout_margin="@dimen/map_label_margin"/>
         </LinearLayout>
 
         <!-- Last Update -->
@@ -129,12 +89,6 @@
                 android:gravity="center"
                 android:layout_margin="@dimen/map_label_margin"/>
 
-            <TextView
-                android:id="@+id/last_network_update_time_tv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="end"
-                android:layout_margin="@dimen/map_label_margin"/>
         </LinearLayout>
 
     </LinearLayout>

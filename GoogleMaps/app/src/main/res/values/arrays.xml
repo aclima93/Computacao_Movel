@@ -20,14 +20,14 @@
 
     <!-- Values -->
     <string-array name="map_controls_values">
+        <item>false</item>
+        <item>false</item>
+        <item>false</item>
+        <item>false</item>
         <item>true</item>
         <item>true</item>
         <item>true</item>
-        <item>true</item>
-        <item>true</item>
-        <item>true</item>
-        <item>true</item>
-        <item>true</item>
+        <item>false</item>
         <item>true</item>
     </string-array>
 
