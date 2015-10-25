@@ -1,4 +1,4 @@
-package com.cm.workshop.mapcontrols;
+package com.cm.workshop.mapcontrolsdemo;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

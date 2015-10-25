@@ -1,4 +1,4 @@
-package com.cm.workshop.mapcontrols;
+package com.cm.workshop.mapcontrolsdemo;
 
 import android.location.Location;
 import android.os.Bundle;
@@ -21,7 +21,7 @@ import com.google.android.gms.maps.model.LatLng;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class MapsActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MapsControlsDemoActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
 
     // Map
     private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
@@ -44,7 +44,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        setContentView(R.layout.activity_maps_controls_demo);
 
         Log.v(EVENT, "onCreate");
 
@@ -133,7 +133,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     /**
-     * A LocationRequest is what determines the frequency, precision, priority, etc. of location updates.
+     * A LocationRequest determines the frequency, precision, priority, etc. of location updates.
      */
     protected void createLocationRequest(){
 

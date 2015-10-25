@@ -316,7 +316,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     }
 
     /**
-     * A LocationRequest is what determines the frequency, precision, priority, etc. of location updates.
+     * A LocationRequest determines the frequency, precision, priority, etc. of location updates.
      */
     protected void createLocationRequest(){
 

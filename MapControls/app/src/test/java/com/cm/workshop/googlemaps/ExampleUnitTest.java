@@ -1,4 +1,4 @@
-package com.cm.workshop.mapcontrols;
+package com.cm.workshop.mapcontrolsdemo;
 
 import org.junit.Test;
 

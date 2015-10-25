@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">MapControls</string>
+    <string name="app_name">MapControlsDemo</string>
 
-    <string name="title_activity_maps">Map</string>
+    <string name="title_activity_maps">Map Controls Demo</string>
 
     <string name="latitude">Latitude </string>
     <string name="longitude">Longitude</string>

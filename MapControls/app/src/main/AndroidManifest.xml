@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.cm.workshop.mapcontrols"
+    package="com.cm.workshop.mapcontrolsdemo"
     android:installLocation="auto" >
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -27,7 +27,7 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.cm.workshop.mapcontrols.MapsActivity"
+            android:name="com.cm.workshop.mapcontrolsdemo.MapsControlsDemoActivity"
             android:label="@string/title_activity_maps" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
