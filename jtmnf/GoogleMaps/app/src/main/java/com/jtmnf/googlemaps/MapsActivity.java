@@ -3,20 +3,16 @@ package com.jtmnf.googlemaps;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.io.IOException;
 import java.util.List;
@@ -62,7 +58,14 @@ public class MapsActivity extends AppCompatActivity {
 
                         System.out.println("TOSTRING: "+address.toString());
                         */
-                        Toast.makeText(getApplicationContext(), address.getAddressLine(0)+"\n"+address.getAddressLine(1)+"\n"+address.getAddressLine(2), Toast.LENGTH_SHORT).show();
+
+                        String addressStr = "";
+                        for(int i = 0; i < address.getMaxAddressLineIndex(); i++){
+                            if (address.getAddressLine(i) != null)
+                                addressStr += address.getAddressLine(i) + "\n";
+                        }
+
+                        Toast.makeText(getApplicationContext(), addressStr.substring(0, addressStr.length()-1), Toast.LENGTH_SHORT).show();
                     }
 
                 } catch (IOException e) {

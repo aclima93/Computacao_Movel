@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -35,14 +37,16 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PolylineOptions;
 
+import java.io.IOException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class MapsActivity extends AppCompatActivity
-        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener {
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener, GoogleMap.OnMapClickListener {
 
     // Map
     private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
@@ -381,6 +385,10 @@ public class MapsActivity extends AppCompatActivity
 
         Log.v(FUNCTION, "setUpMap - Applying map settings.");
 
+        // GeoLocation
+        googleMap.setOnMapClickListener(this);
+
+        // Routing
         googleMap.setOnMapLongClickListener(this);
 
         //Put camera in Coimbra region
@@ -595,7 +603,38 @@ public class MapsActivity extends AppCompatActivity
         }
     }
 
+
+    @Override
+    public void onMapClick(LatLng latLng) {
+
+        Log.v(EVENT, "onMapClick - Show GeoLocation.");
+
+        // GeoLocation
+
+        Geocoder geocoderCoords = new Geocoder(getApplicationContext());
+        List<Address> addressList;
+
+        try {
+            addressList = geocoderCoords.getFromLocation(latLng.latitude, latLng.longitude, 1);
+
+            for (Address address : addressList) {
+
+                String addressStr = "";
+                for(int i = 0; i < address.getMaxAddressLineIndex(); i++){
+                    if (address.getAddressLine(i) != null)
+                        addressStr += address.getAddressLine(i) + "\n";
+                }
+
+                Toast.makeText(getApplicationContext(), addressStr.substring(0, addressStr.length()-1), Toast.LENGTH_SHORT).show();
+            }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public GoogleMap getGoogleMap() {
         return googleMap;
     }
+    
 }
