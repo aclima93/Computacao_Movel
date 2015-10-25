@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
@@ -18,6 +19,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.directions.route.Route;
+import com.directions.route.Routing;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
@@ -30,15 +33,20 @@ import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.PolylineOptions;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.concurrent.ExecutionException;
 
-public class MapsActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener {
+public class MapsActivity extends AppCompatActivity
+        implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnMapLongClickListener {
 
     // Map
     private GoogleMap googleMap; // Might be null if Google Play services APK is not available.
+    private static final LatLng COIMBRA = new LatLng(40.2025, -8.4121);
     private LinearLayout coordinatesLayout;
 
     // GPS Location
@@ -61,19 +69,19 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
     private static final int NETWORK_UPDATE_INTERVAL = 1000;
     private static final int NETWORK_UPDATE_DISTANCE = 0;
 
-    // HashMaps for storing our configurations
+    // Start and Finish Markers
+    private ArrayList<MarkerOptions> markers;
+
+    // HashMap for storing map controls configurations
     private HashMap<String, Boolean> mapControlConfigurations;
-    private HashMap<String, Object> markerConfigurations;
 
     // Keys for Intent Objects
     public static final String MAP_CONTROL_CONFIGURATIONS_KEY = "mapControlConfigurations";
     public static final String MAP_TYPE_CONFIGURATIONS_KEY = "mapTypeConfigurations";
-    public static final String MARKER_CONFIGURATIONS_KEY = "markerConfigurations";
 
     // (Random) Request Codes. Puns intended
     private static final int MAP_CONTROL_CONFIGURATIONS_RC = 666; // hail science!
     private static final int MAP_TYPE_CONFIGURATIONS_RC = 1337; // illuminati elite
-    private static final int MARKER_CONFIGURATIONS_RC = 31415; // useful for pi charts
 
     // Logging Strings
     private static final String EVENT = "Event";
@@ -129,15 +137,16 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
                 openMapTypesSettings();
                 return true;
             case R.id.action_markers:
-                openMarkersSettings();
+                clearAllMarkers();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
     }
 
-    private void openMarkersSettings() {
-        // TODO:
+    private void clearAllMarkers() {
+        googleMap.clear();
+        markers.clear();
     }
 
     private void openMapTypesSettings() {
@@ -182,9 +191,6 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
                 googleMap.setMapType(resultIntent.getIntExtra(MAP_TYPE_CONFIGURATIONS_KEY, 0));
 
-            } else if (requestCode == MARKER_CONFIGURATIONS_RC) {
-
-                markerConfigurations = (HashMap<String, Object>) resultIntent.getSerializableExtra(MARKER_CONFIGURATIONS_KEY);
             }
         }
 
@@ -211,7 +217,7 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
      */
     private void initMarkerConfigurations() {
 
-        markerConfigurations = new HashMap<>();
+        markers = new ArrayList<>();
     }
 
     @Override
@@ -367,23 +373,20 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
 
     /**
      * This is where we can add markers or lines, add listeners or move the camera.
+     * Based on the user configurations, set the map UI and listeners.
      * <p/>
      * This should only be called once and when we are sure that {@link #googleMap} is not null.
      */
     private void setUpMap() {
 
-        Log.v(FUNCTION, "setUpMap - Setting up map.");
+        Log.v(FUNCTION, "setUpMap - Applying map settings.");
 
-        applyMapSettings();
+        googleMap.setOnMapLongClickListener(this);
 
-    }
+        //Put camera in Coimbra region
+        googleMap.moveCamera(CameraUpdateFactory.newLatLng(COIMBRA));
+        googleMap.animateCamera(CameraUpdateFactory.zoomTo(10));
 
-    /**
-     * Based on the user configurations, set the map UI and listeners.
-     */
-    private void applyMapSettings() {
-
-        Log.v(FUNCTION, "applyMapSettings - Applying map settings.");
 
         // Compass
         String compassKey = getString(R.string.compass_title);
@@ -530,6 +533,66 @@ public class MapsActivity extends AppCompatActivity implements GoogleApiClient.C
         networkLongitudeTextView.setText(String.valueOf(location.getLongitude()));
         lastNetworkUpdateTimeTextView.setText(lastNetworkUpdateTime);
 
+    }
+
+    @Override
+    public void onMapLongClick(LatLng point) {
+
+        Log.v(EVENT, "onMapLongClick");
+
+        //If we have already 2 markers we have to remove one of them
+        if (markers.size() >= 2) {
+            markers.remove(0);
+        }
+
+        //And add a new one by FIFO
+        markers.add(new MarkerOptions().position(point));
+
+        //Put Markers in the map
+        for (int i = 0; i < markers.size(); i++) {
+            if (i == 0)
+                googleMap.addMarker(markers.get(i).title("Start").draggable(true));
+            else
+                googleMap.addMarker(markers.get(i).title("Finish").draggable(true));
+
+        }
+
+        //If we are in ready to calculate a route (2 markers)
+        if(markers.size()>=2){
+            route();
+        }
+    }
+
+    public void route() {
+
+        //Define de route that we want
+        Routing routing = new Routing.Builder()
+                .travelMode(Routing.TravelMode.DRIVING)
+                .waypoints(markers.get(0).getPosition(), markers.get(1).getPosition())
+                .build();
+
+        //Calculation of the route
+        routing.execute();
+
+        //Get information about the nodes
+        ArrayList<Route> route;
+        try {
+            route = routing.get();
+        } catch (InterruptedException | ExecutionException e) {
+            e.printStackTrace();
+            route = new ArrayList<>();
+        }
+
+        //Add route to the map
+        if(route.size()>=0) {
+            for (int i = 0; i < route.size(); i++) {
+                PolylineOptions polyoptions = new PolylineOptions();
+                polyoptions.color(Color.BLUE);
+                polyoptions.width(10);
+                polyoptions.addAll(route.get(i).getPoints());
+                googleMap.addPolyline(polyoptions);
+            }
+        }
     }
 
     public GoogleMap getGoogleMap() {

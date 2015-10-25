@@ -14,7 +14,7 @@
 
     <item android:id="@+id/action_markers"
           android:icon="@drawable/ic_place_white_24dp"
-          android:title="@string/action_markers"
+          android:title="@string/action_delete_markers"
           yourapp:showAsAction="ifRoom" />
 
 </menu>
