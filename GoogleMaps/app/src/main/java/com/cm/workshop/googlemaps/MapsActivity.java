@@ -235,6 +235,12 @@ public class MapsActivity extends AppCompatActivity
 
     @Override
     public void onConnectionSuspended(int i) {
+
+        /*
+         * All requests have been canceled and no outstanding listeners will be executed.
+         * GoogleApiClient will automatically attempt to restore the connection.
+         */
+
         Log.v(EVENT, "onConnectionSuspended - Location connection suspended.");
         Toast.makeText(getApplicationContext(), "Location connection suspended.", Toast.LENGTH_LONG).show();
     }
