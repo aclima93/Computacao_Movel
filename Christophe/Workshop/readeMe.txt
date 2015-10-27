@@ -1,0 +1,70 @@
+
+Markers:
+	DEI
+	Departamento de Engenharia Informática
+	40.1867, -8.4157
+
+	DEEC
+	Departamento de Engenharia Electrotécnica e de Computadores
+	40.1866, -8.4170
+
+	DEQ
+	Departamento de Engenharia Química
+	40.1862, -8.4179
+
+	DEC
+	Departamento de Engenharia Civil
+	40.1856, -8.4152
+
+	DEM
+	Departamento de Engenharia Mecânica
+	40.1851, -8.4127
+
+	FCTUC
+	Faculdade de Ciências e Tecnologias 
+	40.1865, -8.4126
+
+
+Folder: Project/app/src/main/res/drawable
+
+
+
+
+
+Cluster:
+	library: 'com.google.maps.android:android-maps-utils:x.y.z'
+
+
+---------------------------------------------------------------------
+
+	public class MyItem implements ClusterItem {
+        private final LatLng mPosition;
+
+        public MyItem(double lat, double lng) {
+            mPosition = new LatLng(lat, lng);
+        }
+
+        @Override
+        public LatLng getPosition() {
+            return mPosition;
+        }
+    }
+
+----------------------------------------------------------------------
+
+
+    private void addItems(ClusterManager cluster) {
+
+        double lat = 40.2026;
+        double lng = -8.4108;
+        
+        for (int i = 0; i < 100; i++) {
+            Random random = new Random();
+            double offset1 = (random.nextDouble()*0.005)-0.0025;
+            double offset2 = (random.nextDouble()*0.005)-0.0025;
+            lat = lat + offset1;
+            lng = lng + offset2;
+            MyItem offsetItem = new MyItem(lat, lng);
+            cluster.addItem(offsetItem);
+        }
+    }
