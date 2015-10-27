@@ -482,7 +482,7 @@ public class MapsActivity extends AppCompatActivity
         // Rotate Gestures
         String rotateGesturesKey = getString(R.string.rotate_gestures_title);
         if (mapControlConfigurations.containsKey(rotateGesturesKey) ) {
-            googleMap.getUiSettings().setMapToolbarEnabled(mapControlConfigurations.get(rotateGesturesKey));
+            googleMap.getUiSettings().setRotateGesturesEnabled(mapControlConfigurations.get(rotateGesturesKey));
         }
 
         // Scroll Gestures
